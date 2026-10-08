@@ -1,0 +1,24 @@
+workspace:
+  name: fabric-workspace
+  lakehouse: enterprise_lakehouse
+
+source:
+  type: files
+  path: Files/raw/source_data
+  format: csv
+
+layers:
+  bronze_table: bronze_raw_data
+  silver_table: silver_clean_data
+  gold_table: gold_business_ready
+
+quality:
+  required_columns:
+    - id
+    - event_date
+  deduplicate_on:
+    - id
+
+visualization:
+  semantic_model: sales_analytics_model
+  refresh_after_pipeline: true
