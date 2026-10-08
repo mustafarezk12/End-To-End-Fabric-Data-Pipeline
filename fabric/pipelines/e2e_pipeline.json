@@ -1,0 +1,42 @@
+{
+  "name": "e2e_fabric_data_pipeline",
+  "description": "Orchestrates ingestion, transformation, loading to lakehouse, and BI readiness.",
+  "parameters": {
+    "config_path": "fabric/config/pipeline_config.yaml"
+  },
+  "activities": [
+    {
+      "name": "ingest_raw_to_bronze",
+      "type": "notebook",
+      "notebook": "fabric/notebooks/01_ingest_bronze.py"
+    },
+    {
+      "name": "transform_bronze_to_silver",
+      "type": "notebook",
+      "dependsOn": ["ingest_raw_to_bronze"],
+      "notebook": "fabric/notebooks/02_transform_silver.py"
+    },
+    {
+      "name": "transform_silver_to_gold",
+      "type": "notebook",
+      "dependsOn": ["transform_bronze_to_silver"],
+      "notebook": "fabric/notebooks/03_publish_gold.py"
+    },
+    {
+      "name": "data_quality_checks",
+      "type": "validation",
+      "dependsOn": ["transform_silver_to_gold"],
+      "rules": [
+        "gold_tables_not_empty",
+        "required_columns_present",
+        "no_duplicate_business_keys"
+      ]
+    },
+    {
+      "name": "refresh_semantic_model",
+      "type": "semantic_model_refresh",
+      "dependsOn": ["data_quality_checks"],
+      "target": "sales_analytics_model"
+    }
+  ]
+}
