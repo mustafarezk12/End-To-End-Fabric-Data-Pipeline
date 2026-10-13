@@ -63,7 +63,7 @@ flowchart LR
 **Step 1: Ingestion (`Pipeline_1`)**
 A Lookup activity reads the file list, a ForEach loops over it, and a Copy data activity pulls each file from GitHub over HTTP. The `rel_url` pipeline parameter holds the GitHub path.
 
-![Pipeline_1: Lookup, ForEach and Copy data](Images/pipeline_1.png)
+![Pipeline_1: Lookup, ForEach and Copy data](Images/Pipeline_1.png)
 
 **Step 2: Orchestration and alerting (`parent_pipeline`)**
 Invokes `Pipeline_1`, then `Pipeline_2`, and sends an Office 365 email with the run status. It runs on a daily schedule.
