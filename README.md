@@ -58,6 +58,33 @@ flowchart LR
 
 **Flow in one sentence:** GitHub → `Pipeline_1` → Lakehouse Bronze → Spark Silver → incremental copy → Warehouse Gold (star schema) → Power BI, all triggered and monitored by `parent_pipeline`.
 
+### The flow in screenshots
+
+**Step 1: Ingestion (`Pipeline_1`)**
+A Lookup activity reads the file list, a ForEach loops over it, and a Copy data activity pulls each file from GitHub over HTTP. The `rel_url` pipeline parameter holds the GitHub path.
+
+![Pipeline_1: Lookup, ForEach and Copy data](Images/pipeline_1.png)
+
+**Step 2: Orchestration and alerting (`parent_pipeline`)**
+Invokes `Pipeline_1`, then `Pipeline_2`, and sends an Office 365 email with the run status. It runs on a daily schedule.
+
+![parent_pipeline: Invoke pipelines and Office 365 Email](Images/parent_pipeline.png)
+
+**Step 3: Bronze layer (Lakehouse)**
+Raw files land unchanged in the Lakehouse, one folder per source entity.
+
+![Lakehouse: Bronze layer raw data folders](Images/lakehouse.png)
+
+**Step 4: Gold layer (Warehouse star schema)**
+The cleaned Silver data is loaded incrementally into the `gold` schema of the Warehouse: `fact_sales` and the customer, product, product category, subcategory, territory, and date dimensions.
+
+![Warehouse: gold schema star schema tables and fact_sales query](Images/warehouse.png)
+
+**Step 5: Power BI dashboard**
+Power BI connects directly to the Gold fact table to show the sales KPIs and the daily sales trend.
+
+![Power BI sales dashboard](Images/dashboard.png)
+
 ---
 
 ## 3. Tech stack
@@ -245,9 +272,7 @@ Power BI connects **directly to the Fabric Warehouse**, so the report always ref
 
 **Visual:** daily **sales trend** from Jan 2016 to mid 2017, showing steady growth with a clear peak in early 2017.
 
-> Add your screenshots to `docs/images/` and link them here:
->
-> `![Dashboard](docs/images/dashboard.png)`
+![Power BI sales dashboard](docs/images/dashboard.png)
 
 ---
 
@@ -258,7 +283,6 @@ Power BI connects **directly to the Fabric Warehouse**, so the report always ref
 ├── README.md
 ├── docs/
 │   └── images/
-│       ├── architecture.png
 │       ├── pipeline_1.png
 │       ├── parent_pipeline.png
 │       ├── lakehouse.png
